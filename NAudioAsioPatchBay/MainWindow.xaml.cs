@@ -47,15 +47,18 @@ namespace NAudioAsioPatchBay
                 inputPatcher.RoutingMatrix[0, 0] = (float) (leftChannel * sliderVolume1.Value / sliderVolume1.Maximum);
                 inputPatcher.RoutingMatrix[0, 1] = (float) (rightChannel * sliderVolume1.Value / sliderVolume1.Maximum);
 
-                // I'm panning the second input to the stero
+                if (inputPatcher.RoutingMatrix.GetLength(1) >= 4)
+                {
+                    // I'm panning the second input to the stero
 
-                pan = (float)sliderPan2.Value; // in range -1 to 1
-                normPan = (-pan + 1) / 2;
-                leftChannel = (float)Math.Sqrt(normPan);
-                rightChannel = (float)Math.Sqrt(1 - normPan);
+                    pan = (float) sliderPan2.Value; // in range -1 to 1
+                    normPan = (-pan + 1)/2;
+                    leftChannel = (float) Math.Sqrt(normPan);
+                    rightChannel = (float) Math.Sqrt(1 - normPan);
 
-                inputPatcher.RoutingMatrix[1, 2] = (float)(leftChannel * sliderVolume2.Value / sliderVolume2.Maximum);
-                inputPatcher.RoutingMatrix[1, 3] = (float)(rightChannel * sliderVolume2.Value / sliderVolume2.Maximum);
+                    inputPatcher.RoutingMatrix[1, 2] = (float) (leftChannel*sliderVolume2.Value/sliderVolume2.Maximum);
+                    inputPatcher.RoutingMatrix[1, 3] = (float) (rightChannel*sliderVolume2.Value/sliderVolume2.Maximum);
+                }
             }
         }
 
@@ -66,7 +69,7 @@ namespace NAudioAsioPatchBay
                 running = true;
                 asioOut = new AsioOut((string)comboAsioDevices.SelectedItem);
                 int inputChannels = asioOut.DriverInputChannelCount; // that's all my soundcard has :(
-                int outputChannels = Math.Min(asioOut.DriverOutputChannelCount, 2); // UI only letting us route to two at the moment
+                int outputChannels = Math.Min(asioOut.DriverOutputChannelCount, 4); // support up to 4
                 inputPatcher = new AsioInputPatcher(44100, inputChannels, outputChannels);
                 int ignored = 0; // yuck, really need to improve my API
                 
